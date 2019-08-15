@@ -5,7 +5,7 @@ const mongoose        = require('mongoose');
 const path            = require('path');
 const session         = require('express-session')
 const MongoStore      = require('connect-mongo')(session);
-const logger          = require('morgan');
+// const logger          = require('morgan');
 const cors            = require("cors");
 
 require('dotenv').config();
@@ -13,6 +13,11 @@ mongoose.Promise = global.Promise;
 const db = mongoose.connection
 
 // User Sessions
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
+
 app.use(session({
   secret: process.env.SESSION_SECRET,
   store: new MongoStore({ 
@@ -34,10 +39,10 @@ mongoose.connect(process.env.MONGO_PASS, {useNewUrlParser: true})
 });
 
 // Setup
-app.use(logger('dev'));
+// app.use(logger('dev'));
 app.use(cookieParser());
-app.use(cors());
-app.use("/", express.static('doc'))
+
+// app.use("/", express.static('doc'))
 app.use(express.json());
 app.use(express.urlencoded({limit: '50mb', extended: true}));
 
