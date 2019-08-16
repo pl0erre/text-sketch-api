@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
-var createError = require('http-errors')
+var createError = require('http-errors');
+
 
 router.post("/signup", (req, res, next)=> {   
     User.create(req.body)
@@ -42,6 +43,7 @@ router.post("/login", (req, res, next)=> {
 
 router.get("/logout", (req, res, next)=> {
     req.session.destroy(); //! session of current user must be destroyed
+    res.clearCookie('connect.sid')
     res.status(205).end();
 })
 

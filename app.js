@@ -22,7 +22,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   store: new MongoStore({ 
     mongooseConnection: db,
-    ttl: (0.5 * 24 * 60 * 60), //! 12 hours
+    ttl: (1 * 24 * 60 * 60), //! 12 hours
     autoremove: 'native'
   }),
   resave: true,
