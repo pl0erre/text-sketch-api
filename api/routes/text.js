@@ -1,126 +1,39 @@
 const express = require("express");
 const router = express.Router();
-const qs = require("querystring");
-const http = require("https");
+const axios = require('axios');
 require('dotenv').config();
 
 
-//! SUMMARIZATION
 router.post("/process", (req, res, next)=> {   
-  
+
   let text_url = req.body.text_url
-  let nr_sentences = req.body.nr_sentences 
+  let nr_sentences = req.body.nr_sentences
 
-  var options = {
-    "method": "POST",
-    "hostname": "api.meaningcloud.com",
-    "port": null,
-    "path": "/summarization-1.0",
-    "headers": {
-      "content-type": "application/x-www-form-urlencoded"
-    }
-  };
+  function getSummary() {
+    return axios.get(`${process.env.SUMMARIZE_API}${process.env.MEANINGCLOUD_KEY}&url=${text_url}&sentences=${nr_sentences}`)
+  }
 
-  var req = http.request(options, function (res2) {
-    var chunks = [];
+  function getClassification() {
+    return axios.get(`${process.env.CLASSIFICATION_API}${process.env.MEANINGCLOUD_KEY}&url=${text_url}&model=IPTC_en`)
+  }
 
-    res2.on("data", function (chunk) {
-      chunks.push(chunk);
-    });
+  function getLanguage() {
+    return axios.get(`${process.env.LANGUAGE_API}${process.env.MEANINGCLOUD_KEY}&url=${text_url}`)
+  }
 
-    res2.on("end", function () {
-      var body = JSON.parse(Buffer.concat(chunks).toString());
-      console.log(body);
-      res.status(200).json(body)
-    })
-  });
-
-  req.write(qs.stringify({
-    key: process.env.MEANINGCLOUD_KEY,
-    txt: "",
-    url: text_url,
-    doc: 'YOUR_DOC_VALUE',
-    sentences: nr_sentences
-  }));
-  req.end();
+  axios.all([getSummary(), getClassification(), getLanguage()])
+  .then(axios.spread(function(summary, classification, language) {
+    let data = {
+      summary: summary.data.summary, 
+      classification: classification.data.category_list, 
+      language: language.data.language_list
+    };
+    res.status(200).json(data)
+  }))
+  .catch((err)=>{
+    console.log(err);
+  })
 })
 
-// //! CATEGORIZATION
-// router.post("/process", (req, res, next)=> {   
-
-//   let text_url = req.body.text_url
-
-//   var options = {
-//   "method": "POST",
-//   "hostname": "api.meaningcloud.com",
-//   "port": null,
-//   "path": "/class-1.1",
-//   "headers": {
-//     "content-type": "application/x-www-form-urlencoded"
-//     }
-//   };
-
-//   var req = http.request(options, function (res2) {
-//     var chunks = [];
-
-//     res2.on("data", function (chunk) {
-//       chunks.push(chunk);
-//     });
-
-//     res2.on("end", function () {
-//       var body = JSON.parse(Buffer.concat(chunks).toString());
-//       console.log(body);
-//       res.status(200).json(body)
-//     })
-//   });
-
-//   req.write(qs.stringify({
-//     key: process.env.MEANINGCLOUD_KEY,
-//     txt: "",
-//     url: text_url,
-//     doc: 'YOUR_DOC_VALUE',
-//     model: IPTC_en
-//   }));
-//   req.end();
-// })
-
-
-// //! LANGUAGE IDENTIFICATION
-// router.post("/process", (req, res, next)=> {   
-
-//   let text_url = req.body.text_url
-
-//   var options = {
-//     "method": "POST",
-//     "hostname": "api.meaningcloud.com",
-//     "port": null,
-//     "path": "/lang-2.0",
-//     "headers": {
-//       "content-type": "application/x-www-form-urlencoded"
-//     }
-//   };
-
-//   var req = http.request(options, function (res2) {
-//     var chunks = [];
-
-//     res2.on("data", function (chunk) {
-//       chunks.push(chunk);
-//     });
-
-//     res2.on("end", function () {
-//       var body = JSON.parse(Buffer.concat(chunks).toString());
-//       console.log(body);
-//       res.status(200).json(body)
-//     })
-//   });
-
-//   req.write(qs.stringify({
-//     key: process.env.MEANINGCLOUD_KEY,
-//     txt: "",
-//     url: text_url,
-//     doc: 'YOUR_DOC_VALUE',
-//   }));
-//   req.end();
-// })
-// !EXPORT ROUTER
+// EXPORT ROUTER
 module.exports = router;
