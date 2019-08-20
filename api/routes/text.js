@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
+const Text = require("../models/Text");
+const User = require("../models/User");
+var createError = require('http-errors')
 const axios = require('axios');
+const mongoose = require("mongoose");
 require('dotenv').config();
 
 
@@ -31,8 +35,36 @@ router.post("/process", (req, res, next)=> {
     res.status(200).json(data)
   }))
   .catch((err)=>{
-    console.log(err);
+    next(createError(500));
   })
+})
+
+router.post("/save", (req, res, next)=> {
+
+  let newText_temp = JSON.parse(req.body.text)
+  let newText = new Text ({
+    text_name:      newText_temp.text_name,
+    text_processed: newText_temp.text_processed,
+    labels:         newText_temp.labels,
+    languages:      newText_temp.languages,
+    creator:        mongoose.Types.ObjectId(req.session.user.id)
+  })
+
+  Text.find({text_name: {$eq: newText.text_name}})
+    .then((found) => {
+      debugger
+      if(found.length !== 0) {
+        next(createError(409));
+      } else {
+        newText.save()
+        .then(() => {
+          res.status(201)
+        })
+        .catch((err) => {
+          next(createError(500))
+        })
+      }   
+    })   
 })
 
 // EXPORT ROUTER

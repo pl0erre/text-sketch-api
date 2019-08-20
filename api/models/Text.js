@@ -1,23 +1,26 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const ObjectId = mongoose.Schema.Types.ObjectId;
+const User = require("../models/User");
 
 const textSchema = new Schema({
-  name: {
+  text_name: {
     type: String,
-    required: [true, "Name your text"]
+    // required: [true, "Name your text"]
   },
-  content : {
-    type: String
+  text_processed : {
+    type: String,
+    // required: [true, "Name your text"]
   },
-  tags: {
+  labels: {
     type: Array
   },
-  language: {
-    type: String
+  languages: {
+    type: Array
   },
   creator: {
-    type: Schema.Types.ObjectId,
-    ref: "User"
+    type: ObjectId,
+    ref: "user"
   }
 })
 

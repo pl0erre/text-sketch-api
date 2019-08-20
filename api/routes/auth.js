@@ -7,13 +7,13 @@ var createError = require('http-errors');
 router.post("/signup", (req, res, next)=> {   
     User.create(req.body)
         .then((user)=> {
-            let {username, email, password} = user;
-            let sessionData = {username, email, password};
+            let {username, email, password, id} = user;
+            let sessionData = {username, email, password, id};
             req.session.user = sessionData;
-            res.status(200).json(sessionData);
+            res.status(201).json(sessionData);
         })
         .catch((error)=> {
-            if(error.name === "ValidationError") next(createError(400, error.message))
+            if(error.name === "ValidationError") next(createError(406, error.message))
             else next(createError(500));
         })
 })
@@ -26,8 +26,8 @@ router.post("/login", (req, res, next)=> {
             return user.comparePasswords(req.body.password)
                 .then((match)=> {
                     if(match) {
-                        let {username, email, password} = user;
-                        let sessionData = {username, email, password};
+                        let {username, email, password, id}= user;
+                        let sessionData = {username, email, password, id};
                         req.session.user = sessionData;
                         res.status(200).json(sessionData);
                     } else {
