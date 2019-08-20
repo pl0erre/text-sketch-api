@@ -43,7 +43,7 @@ router.post("/login", (req, res, next)=> {
 
 router.get("/logout", (req, res, next)=> {
     req.session.destroy();
-    res.clearCookie('connect.sid')
+    res.clearCookie('connect.sid') 
     res.status(205).end();
 })
 
