@@ -67,5 +67,20 @@ router.post("/save", (req, res, next)=> {
     })   
 })
 
+router.post("/collection", (req, res, next)=> {
+  Text.find({}) //! filter for current user missing
+  .then((collection_data_temp) => {
+    let collection_data = JSON.stringify(collection_data_temp);
+    console.log(collection_data);
+    res.send(collection_data);
+  })
+  .catch((err) => {
+    next(createError(500))
+  })
+})
+
+router.post("/single", (req, res, next)=> {
+  Text.findOne({_id:  })
+
 // EXPORT ROUTER
 module.exports = router;
