@@ -52,7 +52,6 @@ router.post("/save", (req, res, next)=> {
 
   Text.find({text_name: {$eq: newText.text_name}})
     .then((found) => {
-      debugger
       if(found.length !== 0) {
         next(createError(409));
       } else {
@@ -68,19 +67,26 @@ router.post("/save", (req, res, next)=> {
 })
 
 router.post("/collection", (req, res, next)=> {
-  Text.find({}) //! filter for current user missing
+  debugger
+  Text.find({creator: req.session.user.id}) //! filter for current user missing
   .then((collection_data_temp) => {
     let collection_data = JSON.stringify(collection_data_temp);
-    console.log(collection_data);
-    res.send(collection_data);
+    res.status(200).send(collection_data);
   })
   .catch((err) => {
     next(createError(500))
   })
 })
 
-router.post("/single", (req, res, next)=> {
-  Text.findOne({_id:  })
-
+router.post("/delete/:id", (req, res, next)=> {
+  debugger
+  Text.deleteOne({_id: req.params.id })
+  .then(() => {
+    res.status(200)
+  })
+  .catch((err) => {
+    next(createError(500))
+  })
+})
 // EXPORT ROUTER
 module.exports = router;
