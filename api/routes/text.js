@@ -57,7 +57,7 @@ router.post("/save", (req, res, next)=> {
       } else {
         newText.save()
         .then(() => {
-          res.status(201)
+          res.sendStatus(200)
         })
         .catch((err) => {
           next(createError(500))
@@ -67,7 +67,6 @@ router.post("/save", (req, res, next)=> {
 })
 
 router.post("/collection", (req, res, next)=> {
-  debugger
   Text.find({creator: req.session.user.id}) //! filter for current user missing
   .then((collection_data_temp) => {
     let collection_data = JSON.stringify(collection_data_temp);
@@ -79,10 +78,9 @@ router.post("/collection", (req, res, next)=> {
 })
 
 router.post("/delete/:id", (req, res, next)=> {
-  debugger
   Text.deleteOne({_id: req.params.id })
   .then(() => {
-    res.status(200)
+    res.sendStatus(200)
   })
   .catch((err) => {
     next(createError(500))
