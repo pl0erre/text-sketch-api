@@ -67,7 +67,7 @@ router.post("/save", (req, res, next)=> {
 })
 
 router.post("/collection", (req, res, next)=> {
-  Text.find({creator: req.session.user.id}) //! filter for current user missing
+  Text.find({creator: req.session.user.id})
   .then((collection_data_temp) => {
     let collection_data = JSON.stringify(collection_data_temp);
     res.status(200).send(collection_data);

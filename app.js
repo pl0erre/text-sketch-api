@@ -12,6 +12,10 @@ require('dotenv').config();
 mongoose.Promise = global.Promise;
 const db = mongoose.connection
 
+// Setup
+// app.use(logger('dev'));
+app.use(cookieParser());
+
 // User Sessions
 app.use(cors({
   origin: true,
@@ -21,13 +25,33 @@ app.use(cors({
 app.use(session({
   secret: process.env.SESSION_SECRET,
   store: new MongoStore({ 
-    mongooseConnection: db,
-    ttl: (1 * 24 * 60 * 60), //! 12 hours
-    autoremove: 'native'
+    url: process.env.MONGODB_URI,
+    ttl: 2 * 60 * 60 // 2-hour sessions
   }),
-  resave: true,
-  saveUninitialized: true
+  resave: false,
+  saveUninitialized: true,
+  proxy: app.get('env') === 'production',
+  cookie: {
+      secure: app.get('env') === 'production'
+  }
 }))
+
+if (app.get('env') === 'production') {
+  // enforce https and deny put requests over http
+  app.use(function (req, res, next) {
+      let isHttps = req.secure || (req.headers["x-forwarded-proto"] || '').substring(0, 5) === 'https';
+      if (isHttps) next();
+      else {
+          if (req.method === "GET" || req.method === "HEAD") {
+              // enforce heroku subdomain for now
+              let host = "text-sketch-api.herokuapp.com";
+              res.redirect(301, "https://" + host + req.originalUrl);
+          } else {
+              res.status(403).send("Data can only be submitted to this server via https")
+          }
+      }
+  });
+}
 
 // Connecting to database
 mongoose.connect(process.env.MONGO_PASS, {useNewUrlParser: true})
@@ -37,10 +61,6 @@ mongoose.connect(process.env.MONGO_PASS, {useNewUrlParser: true})
 .catch(err => {
   console.error('Error connecting to mongo', err)
 });
-
-// Setup
-// app.use(logger('dev'));
-app.use(cookieParser());
 
 // app.use("/", express.static('doc'))
 app.use(express.json());
