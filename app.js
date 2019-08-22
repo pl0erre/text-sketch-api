@@ -12,10 +12,6 @@ require('dotenv').config();
 mongoose.Promise = global.Promise;
 const db = mongoose.connection
 
-// Setup
-// app.use(logger('dev'));
-app.use(cookieParser());
-
 // User Sessions
 app.use(cors({
   origin: true,
@@ -54,6 +50,10 @@ if (app.get('env') === 'production') {
       }
   });
 }
+
+// Setup
+// app.use(logger('dev'));
+app.use(cookieParser());
 
 // Connecting to database
 mongoose.connect(process.env.MONGO_PASS, {useNewUrlParser: true})
