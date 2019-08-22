@@ -37,6 +37,8 @@ app.use(session({
 }))
 
 if (app.get('env') === 'production') {
+  console.log("Production env! Trusting Proxy")
+  app.set('trust proxy', 1)
   // enforce https and deny put requests over http
   app.use(function (req, res, next) {
       let isHttps = req.secure || (req.headers["x-forwarded-proto"] || '').substring(0, 5) === 'https';
