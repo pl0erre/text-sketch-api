@@ -70,7 +70,7 @@ app.use('/auth', require('./api/routes/auth'));
 app.use('/user', protect, require('./api/routes/user'));
 
 app.use(function(req,res, next){
-  res.send("There was an error")
+  res.sendStatus(418);
 })
 
 app.listen(process.env.PORT, function () {
