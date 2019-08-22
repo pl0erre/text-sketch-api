@@ -73,7 +73,7 @@ app.use(function(req,res, next){
   res.send("There was an error")
 })
 
-app.listen(3001, function () {
+app.listen(process.env.PORT, function () {
   console.log('App listening on port 3001!');
 });
 module.exports = app;
