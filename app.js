@@ -12,6 +12,7 @@ require('dotenv').config();
 mongoose.Promise = global.Promise;
 const db = mongoose.connection
 
+
 // User Sessions
 app.use(cors({
   origin: true,
