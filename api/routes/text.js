@@ -68,7 +68,14 @@ router.post("/save", (req, res, next)=> {
 
 router.post("/collection", (req, res, next)=> {
   console.log(req.session);
-  Text.find({creator: req.session.user.id})
+  let userId = req.body.id;
+  
+  if(req.session.user){
+    userId = req.session.user.id;
+  }
+
+
+  Text.find({creator: userId})
   .then((collection_data_temp) => {
     let collection_data = JSON.stringify(collection_data_temp);
     res.status(200).send(collection_data);

@@ -28,7 +28,8 @@ app.use(session({
   saveUninitialized: true,
   proxy: app.get('env') === 'production',
   cookie: {
-      secure: app.get('env') === 'production'
+    secure: true
+    // secure: app.get('env') === 'production'
   }
 }))
 
