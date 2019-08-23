@@ -67,6 +67,7 @@ mongoose.connect(process.env.MONGO_PASS, {useNewUrlParser: true})
 });
 
 // app.use("/", express.static('doc'))
+app.use(express.static('public'))
 app.use(express.json());
 app.use(express.urlencoded({limit: '50mb', extended: true}));
 
@@ -89,9 +90,14 @@ app.locals.host = process.env.HOST;
 app.locals.port = process.env.PORT;
 
 // Routes
-app.use('/text', require('./api/routes/text'));
-app.use('/auth', require('./api/routes/auth'));
-app.use('/user', protect, require('./api/routes/user'));
+app.use('/api/text', require('./api/routes/text'));
+app.use('/api/auth', require('./api/routes/auth'));
+app.use('/api/user', protect, require('./api/routes/user'));
+
+app.use((req, res, next) => {
+  // If no routes match, send them the React HTML.
+  res.sendFile(__dirname + "/public/index.html");
+});
 
 app.use(function(req,res, next){
   res.sendStatus(418);
